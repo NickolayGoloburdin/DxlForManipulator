@@ -81,7 +81,7 @@ class Manipulator {
                                 ROS_ERROR_STREAM("Failed to change joint mode");      
                             } 
                     }
-            }   
+               
                 dxl_wb.addSyncWriteHandler(*(dxl_id.begin()), "Goal_Position",&log);
 	            dxl_wb.addSyncWriteHandler(*(dxl_id.begin()), "Moving_Speed",&log);
 	            dxl_wb.addSyncWriteHandler(*(dxl_id.begin(), "Goal_Acceleration",&log);
@@ -92,7 +92,20 @@ class Manipulator {
                         dxl_wb.writeRegister(*i, uint16_t(28), uint16_t(1), &p_gain, &log);
                     }
 
-        }
+            }
+
+        void sync_write_pos(){
+            const char*log;
+	
+	        for(int i = 0; i < motor_q; i++){
+	    	
+	    	    dxl_wb.writeRegister(dxl_id[i], "Goal_Position", goal_position[i], &log);
+	    	    dxl_wb.writeRegister(dxl_id[i], "Moving_Speed", goal_velocity[i], &log);
+	    	    dxl_wb.writeRegister(dxl_id[i], "Goal_Acceleration", goal_acceleration[i], &log);
+	    	
+	    }
+	}
+}
         
         
     

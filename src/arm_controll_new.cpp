@@ -71,7 +71,7 @@ class Manipulator {
                         if (!ping_motor(*i,device_number))
                             {
                                 ROS_ERROR_STREAM("Failed to init motor"<<i+1);
-        	                }   
+                            }   
                     }
                 for (auto i : dxl_id)
                     {
@@ -81,7 +81,7 @@ class Manipulator {
                                 ROS_ERROR_STREAM("Failed to change joint mode");      
                             } 
                     }
-               
+            
                 dxl_wb.addSyncWriteHandler(*(dxl_id.begin()), "Goal_Position",&log);
 	            dxl_wb.addSyncWriteHandler(*(dxl_id.begin()), "Moving_Speed",&log);
 	            dxl_wb.addSyncWriteHandler(*(dxl_id.begin(), "Goal_Acceleration",&log);
@@ -94,18 +94,7 @@ class Manipulator {
 
             }
 
-        void sync_write_pos(){
-            const char*log;
-	
-	        for(int i = 0; i < motor_q; i++){
-	    	
-	    	    dxl_wb.writeRegister(dxl_id[i], "Goal_Position", goal_position[i], &log);
-	    	    dxl_wb.writeRegister(dxl_id[i], "Moving_Speed", goal_velocity[i], &log);
-	    	    dxl_wb.writeRegister(dxl_id[i], "Goal_Acceleration", goal_acceleration[i], &log);
-	    	
-	    }
-	}
-}
+        
         
         
     
@@ -130,9 +119,57 @@ class Angle: public Manipulator
 
     }
 
-    
-
-
 }
 
+void sync_write_pos(Manipulator * manip)
+    {
+        const char*log;
+
+        for(int i = 0; i < manip->motor_q; i++)
+            {
+            dxl_wb.writeRegister(manip->dxl_id[i], "Goal_Position", manip->goal_position[i], &log);
+            dxl_wb.writeRegister(manip->dxl_id[i], "Moving_Speed", manip->goal_velocity[i], &log);
+            dxl_wb.writeRegister(manip->dxl_id[i], "Goal_Acceleration", manip->goal_acceleration[i], &log);
+            }
+    }
+
+}
+void disableTorque(uint8_t id)
+    {
+        const char*log;
+        bool result = false;
+        dxl_wb.torqueOff(id, &log);
+    }
+
+
+void read_pos(uint8_t id, Manipulator * manip)
+    {
+        const char*log;
+        int32_t get_data = 0;
+        dxl_wb.itemRead(id, "Present_Position", &get_data, &log);
+        manip->present_position[id-1] = get_data;
+
+    }
+
+void read_vel(uint8_t id, Manipulator * manip)
+    {
+        const char*log;
+        int32_t get_data = 0;
+        dxl_wb.itemRead(id,"Present_Speed", &get_data, &log);
+        manip->present_speed[id-1] = get_data; 
+    }
+
+void read_temp(uint8_t id, Manipulator * manip){
+    const char*log;
+    int32_t get_data = 0;
+    dxl_wb.itemRead(id,"Present_Temperature", &get_data, &log);
+    manip->present_temp[id-1] = get_data;
+}
+
+void read_load(uint8_t id, Manipulator * manip){
+    const char*log;
+    int32_t get_data = 0;
+    dxl_wb.itemRead(id,"Present_Load", &get_data, &log);
+    manip->present_load[id-1] = get_data;
+}
 

@@ -31,6 +31,7 @@ class Manipulator {
     public:
     uint16_t device_number = DEVICE_NUMBER;
     int motor_q;
+    bool torque;
     std::vector<int32_t> goal_position; //zero poses
     int32_t velocity = 30;
     std::vector<int32_t> goal_velocity;
@@ -94,7 +95,55 @@ class Manipulator {
 
             }
 
-        
+        void sync_write_pos()
+            {
+                const char*log;
+
+                for(int i = 0; i < motor_q; i++)
+                    {
+                    dxl_wb.writeRegister(dxl_id[i], "Goal_Position", goal_position[i], &log);
+                    dxl_wb.writeRegister(dxl_id[i], "Moving_Speed", goal_velocity[i], &log);
+                    dxl_wb.writeRegister(dxl_id[i], "Goal_Acceleration", goal_acceleration[i], &log);
+                    }
+            }
+        void disable_all_torque()
+        {
+            (auto i : dxl_id)
+            {disable_motor_torque(*i)}
+        }
+        void enable_all_torque()
+        {
+            (auto i : dxl_id)
+            {enable_motor_torque(*i)}
+        }
+
+        void read_all_pos()
+        {
+            (auto i : dxl_id)
+            {read_motor_pos(*i, this)}
+        }
+        void read_all_vel()
+        {
+            (auto i : dxl_id)
+            {read_motor_vel(*i, this)}
+        }
+        void read_all_temp()
+        {
+            (auto i : dxl_id)
+            {read_motor_temp(*i, this)}
+        }
+        void read_all_load()
+        {
+            (auto i : dxl_id)
+            {read_motor_load(*i, this)}
+        }
+        void motor_torque_control(bool torque_flag)
+        {
+            if (torque && )
+                enable_all_torque();
+            else
+                disable_all_torque();
+        }
         
         
     
@@ -114,35 +163,20 @@ class Angle: public Manipulator
         goal_position = {2048, 2048, 2048, 2048, 512, 680};;
         goal_velocity = {40,40,40,40,40,40};
         goal_acceleration = {2,2,2,2};
-
     }
-
-    }
-
-}
-
-void sync_write_pos(Manipulator * manip)
+};
+void disable_motor_torque(uint8_t id)
     {
         const char*log;
-
-        for(int i = 0; i < manip->motor_q; i++)
-            {
-            dxl_wb.writeRegister(manip->dxl_id[i], "Goal_Position", manip->goal_position[i], &log);
-            dxl_wb.writeRegister(manip->dxl_id[i], "Moving_Speed", manip->goal_velocity[i], &log);
-            dxl_wb.writeRegister(manip->dxl_id[i], "Goal_Acceleration", manip->goal_acceleration[i], &log);
-            }
-    }
-
-}
-void disableTorque(uint8_t id)
-    {
-        const char*log;
-        bool result = false;
         dxl_wb.torqueOff(id, &log);
     }
-
-
-void read_pos(uint8_t id, Manipulator * manip)
+void enable_motor_torque(uint8_t id)
+    {
+        const char*log;
+        dxl_wb.torqueOn(id, &log);
+    }
+    
+void read_motor_pos(uint8_t id, Manipulator * manip)
     {
         const char*log;
         int32_t get_data = 0;
@@ -151,7 +185,7 @@ void read_pos(uint8_t id, Manipulator * manip)
 
     }
 
-void read_vel(uint8_t id, Manipulator * manip)
+void read_motor_vel(uint8_t id, Manipulator * manip)
     {
         const char*log;
         int32_t get_data = 0;
@@ -159,17 +193,86 @@ void read_vel(uint8_t id, Manipulator * manip)
         manip->present_speed[id-1] = get_data; 
     }
 
-void read_temp(uint8_t id, Manipulator * manip){
+void read_motor_temp(uint8_t id, Manipulator * manip){
     const char*log;
     int32_t get_data = 0;
     dxl_wb.itemRead(id,"Present_Temperature", &get_data, &log);
     manip->present_temp[id-1] = get_data;
 }
 
-void read_load(uint8_t id, Manipulator * manip){
+void read_motor_load(uint8_t id, Manipulator * manip){
     const char*log;
     int32_t get_data = 0;
     dxl_wb.itemRead(id,"Present_Load", &get_data, &log);
     manip->present_load[id-1] = get_data;
 }
 
+void messageJointscmd(const sensor_msgs::JointState::ConstPtr& toggle_msg)  //controll position
+{	
+    for(int i = 0; i<toggle_msg->position.size(); i++){
+        goal_position[i] = (int)toggle_msg->position[i];
+    }
+    for(int i = 0; i<toggle_msg->position.size(); i++){
+        goal_velocity[i] = (int)toggle_msg->velocity[i];
+    }
+    for(int i = 0; i<toggle_msg->position.size(); i++){
+        goal_acceleration[i] = (int)toggle_msg->effort[i];
+    }
+}
+
+void messageTorqueMotor(const std_msgs::Bool::ConstPtr& msg){
+    torque_flag = msg->data;
+}
+int main(int argc, char **argv)
+{   
+    
+    ms0 = millis();
+    ros::init(argc,argv, "Dxl_Arm");
+    ros::NodeHandle nh;
+    bool param;
+    bool torque_flag;
+    sensor_msgs::JointState joints_msg;
+    sensor_msgs::JointState temp_load;
+    ros::Subscriber jointcmd = nh.subscribe<sensor_msgs::JointState> ("cmd_joints",10, messageJointscmd );
+    ros::Subscriber torque_motor = nh.subscribe<std_msgs::Bool> ("disable_torque",10, messageTorqueMotor);
+    ros::Publisher Joint_State = nh.advertise<sensor_msgs::JointState>("arm_joint_states", 64);
+    ros::Publisher Temp_And_Load = nh.advertise<sensor_msgs::JointState>("temp_load", 64);
+
+    ros::Rate loop_rate(PERIOD_PROTOCOL);
+    std::string manipulator_type;
+    nh.getParam("/arm/manipulator_type",manipulator_type);
+    if (manipulator_type=="angle")
+        {
+            Angle arm;
+            Manipulator * manip = &arm;
+        }
+    manip->set_start_pos();
+    manip->arm_init();
+
+    struct timeval t_s,t_c;
+    gettimeofday(&t_s, NULL);
+    //std::cout<<"start";
+    while(ros::ok()){
+
+        manip->read_all_pos();
+        manip->read_all_vel();
+        manip->sync_write_pos();
+        manip->motor_torque_control(torque_flag);
+
+        joints_msg.velocity = present_speed;
+        joints_msg.position = present_position;
+        joints_msg.header.stamp = ros::Time::now();
+        Joint_State.publish(joints_msg);
+        
+        temp_load.velocity = present_load;
+        temp_load.position = present_temp;
+        temp_load.header.stamp = ros::Time::now();
+        Temp_And_Load.publish(temp_load);
+
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
+    
+        manip->disable_all_torque();
+    return result;
+}

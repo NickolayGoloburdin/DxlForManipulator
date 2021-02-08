@@ -15,6 +15,7 @@
 #include <time.h>
 #include <dynamixel_sdk/dynamixel_sdk.h>
 #include <dynamixel_workbench_toolbox/dynamixel_workbench.h>
+#include <boost>
 
 #define BAUDRATE                        1000000
 #define DEVICENAME                      "/dev/ttyUSB0"
@@ -139,7 +140,7 @@ class Manipulator {
         }
         void motor_torque_control(bool torque_flag)
         {
-            if (torque && )
+            if (!(torque && torque_flag) && (torque_flag == True))
                 enable_all_torque();
             else
                 disable_all_torque();
@@ -207,20 +208,20 @@ void read_motor_load(uint8_t id, Manipulator * manip){
     manip->present_load[id-1] = get_data;
 }
 
-void messageJointscmd(const sensor_msgs::JointState::ConstPtr& toggle_msg)  //controll position
+void messageJointscmd(const sensor_msgs::JointState::ConstPtr& toggle_msg, boost::numeric::ublas::Manipulator* manip )  //controll position
 {	
     for(int i = 0; i<toggle_msg->position.size(); i++){
-        goal_position[i] = (int)toggle_msg->position[i];
+        manip->goal_position[i] = (int)toggle_msg->position[i];
     }
     for(int i = 0; i<toggle_msg->position.size(); i++){
-        goal_velocity[i] = (int)toggle_msg->velocity[i];
+        manip->goal_velocity[i] = (int)toggle_msg->velocity[i];
     }
     for(int i = 0; i<toggle_msg->position.size(); i++){
-        goal_acceleration[i] = (int)toggle_msg->effort[i];
+        manip->goal_acceleration[i] = (int)toggle_msg->effort[i];
     }
 }
 
-void messageTorqueMotor(const std_msgs::Bool::ConstPtr& msg){
+void messageTorqueMotor(const std_msgs::Bool::ConstPtr& msg, boost::numeric::ublas::bool & torque_flag){
     torque_flag = msg->data;
 }
 int main(int argc, char **argv)
@@ -231,21 +232,22 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     bool param;
     bool torque_flag;
-    sensor_msgs::JointState joints_msg;
-    sensor_msgs::JointState temp_load;
-    ros::Subscriber jointcmd = nh.subscribe<sensor_msgs::JointState> ("cmd_joints",10, messageJointscmd );
-    ros::Subscriber torque_motor = nh.subscribe<std_msgs::Bool> ("disable_torque",10, messageTorqueMotor);
-    ros::Publisher Joint_State = nh.advertise<sensor_msgs::JointState>("arm_joint_states", 64);
-    ros::Publisher Temp_And_Load = nh.advertise<sensor_msgs::JointState>("temp_load", 64);
-
-    ros::Rate loop_rate(PERIOD_PROTOCOL);
-    std::string manipulator_type;
     nh.getParam("/arm/manipulator_type",manipulator_type);
     if (manipulator_type=="angle")
         {
             Angle arm;
             Manipulator * manip = &arm;
         }
+    sensor_msgs::JointState joints_msg;
+    sensor_msgs::JointState temp_load;
+    ros::Subscriber jointcmd = nh.subscribe<sensor_msgs::JointState> ("cmd_joints",10, boost::bind(messageJointscmd, _1, manip );
+    ros::Subscriber torque_motor = nh.subscribe<std_msgs::Bool> ("disable_torque",10, boost::bind(messageTorqueMotor, _1, torque_flag);
+    ros::Publisher Joint_State = nh.advertise<sensor_msgs::JointState>("arm_joint_states", 64);
+    ros::Publisher Temp_And_Load = nh.advertise<sensor_msgs::JointState>("temp_load", 64);
+
+    ros::Rate loop_rate(PERIOD_PROTOCOL);
+    std::string manipulator_type;
+    
     manip->set_start_pos();
     manip->arm_init();
 

@@ -1,6 +1,6 @@
 #include <arm.hpp>
-#include <ros/ros.h>
-
+#include <memory>
+#include <rclcpp/rclcpp.hpp>
 void Manipulator::set_start_pos() {
   for (auto i : dxl_id)
 
@@ -13,7 +13,7 @@ void Manipulator::set_start_pos() {
 }
 
 void Manipulator::arm_init() {
-  const char* log;
+  const char *log;
   if (!init(DEVICENAME, BAUDRATE, &log)) {
     ROS_ERROR_STREAM(log);
     ROS_ERROR_STREAM("Failed to init");
@@ -41,7 +41,7 @@ void Manipulator::arm_init() {
 }
 
 void Manipulator::sync_write_pos() {
-  const char* log;
+  const char *log;
 
   for (int i = 0; i < motor_q; i++) {
     writeRegister(dxl_id[i], "Goal_Position", goal_position[i], &log);
@@ -88,42 +88,70 @@ void Manipulator::motor_torque_control(bool torque_flag) {
 }
 
 bool Manipulator::ping_motor(uint8_t id, uint16_t device_number) {
-  const char* log;
+  const char *log;
   return ping(id, &device_number, &log);
 }
 void Manipulator::disable_motor_torque(uint8_t id) {
-  const char* log;
+  const char *log;
   torqueOff(id, &log);
 }
 void Manipulator::enable_motor_torque(uint8_t id) {
-  const char* log;
+  const char *log;
   torqueOn(id, &log);
 }
 
 void Manipulator::read_motor_pos(uint8_t id) {
-  const char* log;
+  const char *log;
   int32_t get_data = 0;
   itemRead(id, "Present_Position", &get_data, &log);
   present_position[id - 1] = get_data;
 }
 
 void Manipulator::read_motor_vel(uint8_t id) {
-  const char* log;
+  const char *log;
   int32_t get_data = 0;
   itemRead(id, "Present_Speed", &get_data, &log);
   present_speed[id - 1] = get_data;
 }
 
 void Manipulator::read_motor_temp(uint8_t id) {
-  const char* log;
+  const char *log;
   int32_t get_data = 0;
   itemRead(id, "Present_Temperature", &get_data, &log);
   present_temp[id - 1] = get_data;
 }
 
 void Manipulator::read_motor_load(uint8_t id) {
-  const char* log;
+  const char *log;
   int32_t get_data = 0;
   itemRead(id, "Present_Load", &get_data, &log);
   present_load[id - 1] = get_data;
+}
+
+ROSArm::ROSArm(Manipulator *manip)
+    : Node("RosNodeArm"), count_(0), manip_(manip) {
+  manip_->set_start_pos();
+  manip_->arm_init();
+  publisherjs_ = this->create_publisher<sensor_msgs::msg::JointState>(
+      "arm_joint_states", 64);
+  publishertl_ =
+      this->create_publisher<sensor_msgs::msg::JointState>("temp_load", 64);
+  timer_ =
+      this->create_wall_timer(500ms, std::bind(&ROSArm::timer_callback, this));
+}
+void ROSArm::timer_callback() {
+  manip_->read_all_pos();
+  manip_->read_all_vel();
+  manip_->sync_write_pos();
+  manip_->motor_torque_control(torque_flag_);
+
+  joints_msg_.velocity = manip_->present_speed;
+  joints_msg_.position = manip_->present_position;
+  joints_msg_.header.stamp = ros::Time::now();
+  publisherjs_->publish(joint_msg_);
+
+  temp_load_.velocity = manip->present_load;
+  temp_load_.position = manip->present_temp;
+  temp_load_.header.stamp = ros::Time::now();
+  publishertl_->publish(temp_load_);
 }

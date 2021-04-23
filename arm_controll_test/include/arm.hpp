@@ -9,6 +9,8 @@
 #include <boost/bind.hpp>
 #include <dynamixel_sdk/dynamixel_sdk.h>
 #include <dynamixel_workbench_toolbox/dynamixel_workbench.h>
+#include <memory>
+#include <rclcpp/rclcpp.hpp>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -89,4 +91,20 @@ public:
     goal_velocity = {40, 40, 40};
     goal_acceleration = {2, 2, 2};
   }
+};
+class ROSArm : public rclcpp::Node {
+public:
+  explicit ROSArm(Manipulator *manip);
+
+  Manipulator *manip_;
+
+private:
+  void timer_callback();
+  rclcpp::TimerBase::SharedPtr timer_;
+  rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr publisherjs_;
+  rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr publishertl_;
+  size_t count_;
+  sensor_msgs::msg::JointState joints_msg_;
+  sensor_msgs::msg::JointState temp_load_;
+  bool torque_flag_;
 };

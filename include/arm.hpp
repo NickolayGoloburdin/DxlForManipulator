@@ -9,9 +9,10 @@
 #include <boost/bind.hpp>
 #include <dynamixel_sdk/dynamixel_sdk.h>
 #include <dynamixel_workbench_toolbox/dynamixel_workbench.h>
-#include <memory>
-#include <rclcpp/rclcpp.hpp>
 #include <stdio.h>
+#include "rclcpp/rclcpp.hpp"
+#include <sensor_msgs/msg/joint_state.hpp>
+#include <std_msgs/msg/bool.hpp>
 #include <stdlib.h>
 #include <time.h>
 #include <vector>

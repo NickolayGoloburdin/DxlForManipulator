@@ -1,0 +1,8 @@
+CMake Error at /home/nuc/ros2_rolling/install/ament_cmake_target_dependencies/share/ament_cmake_target_dependencies/cmake/ament_target_dependencies.cmake:77 (message):
+  ament_target_dependencies() the passed package name 'dynamixel_workbench'
+  was not found before
+Call Stack (most recent call first):
+  CMakeLists.txt:19 (ament_target_dependencies)
+
+
+make: *** [Makefile:310: cmake_check_build_system] Error 1

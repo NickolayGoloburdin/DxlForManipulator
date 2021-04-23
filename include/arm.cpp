@@ -1,6 +1,5 @@
-#include <arm.hpp>
-#include <memory>
-#include <rclcpp/rclcpp.hpp>
+#include "arm.hpp"
+
 void Manipulator::set_start_pos() {
   for (auto i : dxl_id)
 
@@ -15,18 +14,18 @@ void Manipulator::set_start_pos() {
 void Manipulator::arm_init() {
   const char *log;
   if (!init(DEVICENAME, BAUDRATE, &log)) {
-    ROS_ERROR_STREAM(log);
-    ROS_ERROR_STREAM("Failed to init");
+    
+    std::cout << "Failed to init";
   }
   for (auto i : dxl_id) {
     if (!ping_motor(i, device_number)) {
-      ROS_ERROR_STREAM("Failed to init motor" << i + 1);
+       std::cout << "Failed to init motor" << i + 1;
     }
   }
   for (auto i : dxl_id) {
     if (!jointMode(i, velocity, 100, &log)) {
-      ROS_ERROR_STREAM(log);
-      ROS_ERROR_STREAM("Failed to change joint mode");
+      
+       std::cout << "Failed to change joint mode";
     }
   }
 
@@ -137,7 +136,7 @@ ROSArm::ROSArm(Manipulator *manip)
   publishertl_ =
       this->create_publisher<sensor_msgs::msg::JointState>("temp_load", 64);
   timer_ =
-      this->create_wall_timer(500ms, std::bind(&ROSArm::timer_callback, this));
+      this->create_wall_timer(500, std::bind(&ROSArm::timer_callback, this));
 }
 void ROSArm::timer_callback() {
   manip_->read_all_pos();
@@ -147,11 +146,11 @@ void ROSArm::timer_callback() {
 
   joints_msg_.velocity = manip_->present_speed;
   joints_msg_.position = manip_->present_position;
-  joints_msg_.header.stamp = ros::Time::now();
-  publisherjs_->publish(joint_msg_);
+  joints_msg_.header.stamp = now();
+  publisherjs_->publish(joints_msg_);
 
-  temp_load_.velocity = manip->present_load;
-  temp_load_.position = manip->present_temp;
-  temp_load_.header.stamp = ros::Time::now();
+  temp_load_.velocity = manip_->present_load;
+  temp_load_.position = manip_->present_temp;
+  temp_load_.header.stamp = now();
   publishertl_->publish(temp_load_);
 }

@@ -7,8 +7,7 @@
 #include <conio.h>
 #endif
 #include <arm.cpp>
-#include <sensor_msgs/msg/JointState.h>
-#include <std_msgs/msg/Bool.h>
+
 #define PROTOCOL_VERSION 1.0
 #define PERIOD_PROTOCOL 15
 #define PERIOD_MOVEMENT 15
@@ -87,7 +86,7 @@ int main(int argc, char **argv) {
   // manip->disable_all_torque();
   // return 0;
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<ROSArm(manip)>(ROSArm(manip)));
+  rclcpp::spin(std::make_shared<ROSArm>(ROSArm(manip)));
   rclcpp::shutdown();
   manip->disable_all_torque();
   return 0;

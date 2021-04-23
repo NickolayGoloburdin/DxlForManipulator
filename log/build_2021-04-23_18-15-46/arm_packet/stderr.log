@@ -1,0 +1,18 @@
+CMake Error at CMakeLists.txt:17 (find_package):
+  By not providing "Finddynamixel_workbench.cmake" in CMAKE_MODULE_PATH this
+  project has asked CMake to find a package configuration file provided by
+  "dynamixel_workbench", but CMake did not find one.
+
+  Could not find a package configuration file provided by
+  "dynamixel_workbench" with any of the following names:
+
+    dynamixel_workbenchConfig.cmake
+    dynamixel_workbench-config.cmake
+
+  Add the installation prefix of "dynamixel_workbench" to CMAKE_PREFIX_PATH
+  or set "dynamixel_workbench_DIR" to a directory containing one of the above
+  files.  If "dynamixel_workbench" provides a separate development package or
+  SDK, be sure it has been installed.
+
+
+make: *** [Makefile:310: cmake_check_build_system] Error 1

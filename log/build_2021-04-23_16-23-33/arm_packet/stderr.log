@@ -1,0 +1,17 @@
+In file included from [01m[K/home/nuc/ros2_arm/src/arm_packet/include/arm.cpp:1[m[K:
+[01m[K/home/nuc/ros2_arm/src/arm_packet/include/arm.hpp:10:10:[m[K [01;31m[Kfatal error: [m[Kdynamixel_sdk/dynamixel_sdk.h: No such file or directory
+   10 | #include [01;31m[K<dynamixel_sdk/dynamixel_sdk.h>[m[K
+      |          [01;31m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+compilation terminated.
+make[2]: *** [CMakeFiles/arm_packet.dir/build.make:63: CMakeFiles/arm_packet.dir/include/arm.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:80: CMakeFiles/arm_packet.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+In file included from [01m[K/home/nuc/ros2_arm/src/arm_packet/include/arm.cpp:1[m[K,
+                 from [01m[K/home/nuc/ros2_arm/src/arm_packet/src/arm_controll.cpp:9[m[K:
+[01m[K/home/nuc/ros2_arm/src/arm_packet/include/arm.hpp:11:10:[m[K [01;31m[Kfatal error: [m[Kdynamixel_workbench_toolbox/dynamixel_workbench.h: No such file or directory
+   11 | #include [01;31m[K<dynamixel_workbench_toolbox/dynamixel_workbench.h>[m[K
+      |          [01;31m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+compilation terminated.
+make[2]: *** [CMakeFiles/arm_controll.dir/build.make:63: CMakeFiles/arm_controll.dir/src/arm_controll.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:107: CMakeFiles/arm_controll.dir/all] Error 2
+make: *** [Makefile:141: all] Error 2

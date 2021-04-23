@@ -1,0 +1,2 @@
+Invoking command in '/home/nuc/ros2_arm/src/arm_packet/build/arm_packet': /usr/bin/cmake /home/nuc/ros2_arm/src/arm_packet -DCMAKE_INSTALL_PREFIX=/home/nuc/ros2_arm/src/arm_packet/install/arm_packet
+Invoked command in '/home/nuc/ros2_arm/src/arm_packet/build/arm_packet' returned '1': /usr/bin/cmake /home/nuc/ros2_arm/src/arm_packet -DCMAKE_INSTALL_PREFIX=/home/nuc/ros2_arm/src/arm_packet/install/arm_packet

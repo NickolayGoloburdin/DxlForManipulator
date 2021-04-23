@@ -1,0 +1,35 @@
+-- Found ament_cmake: 1.1.3 (/home/nuc/ros2_rolling/install/ament_cmake/share/ament_cmake/cmake)
+-- Using PYTHON_EXECUTABLE: /usr/bin/python3
+-- Found rclcpp: 9.0.2 (/home/nuc/ros2_rolling/install/rclcpp/share/rclcpp/cmake)
+-- Using all available rosidl_typesupport_c: rosidl_typesupport_introspection_c;rosidl_typesupport_fastrtps_c
+-- Found rosidl_adapter: 2.2.1 (/home/nuc/ros2_rolling/install/rosidl_adapter/share/rosidl_adapter/cmake)
+-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_introspection_cpp;rosidl_typesupport_fastrtps_cpp
+-- Found rmw_implementation_cmake: 3.3.0 (/home/nuc/ros2_rolling/install/rmw_implementation_cmake/share/rmw_implementation_cmake/cmake)
+-- Found rmw_cyclonedds_cpp: 0.22.1 (/home/nuc/ros2_rolling/install/rmw_cyclonedds_cpp/share/rmw_cyclonedds_cpp/cmake)
+-- Using RMW implementation 'rmw_cyclonedds_cpp' as default
+-- Found sensor_msgs: 2.2.2 (/home/nuc/ros2_rolling/install/sensor_msgs/share/sensor_msgs/cmake)
+-- Found dynamixel_sdk: 3.7.40 (/opt/ros/foxy/share/dynamixel_sdk/cmake)
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/nuc/ros2_arm/src/arm_packet/build/arm_packet
+[35m[1mScanning dependencies of target arm_packet[0m
+[35m[1mScanning dependencies of target arm_controll[0m
+[ 25%] [32mBuilding CXX object CMakeFiles/arm_packet.dir/include/arm.cpp.o[0m
+[ 50%] [32mBuilding CXX object CMakeFiles/arm_controll.dir/src/arm_controll.cpp.o[0m
+In file included from [01m[K/home/nuc/ros2_arm/src/arm_packet/include/arm.cpp:1[m[K:
+[01m[K/home/nuc/ros2_arm/src/arm_packet/include/arm.hpp:10:10:[m[K [01;31m[Kfatal error: [m[Kdynamixel_sdk/dynamixel_sdk.h: No such file or directory
+   10 | #include [01;31m[K<dynamixel_sdk/dynamixel_sdk.h>[m[K
+      |          [01;31m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+compilation terminated.
+make[2]: *** [CMakeFiles/arm_packet.dir/build.make:63: CMakeFiles/arm_packet.dir/include/arm.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:80: CMakeFiles/arm_packet.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+In file included from [01m[K/home/nuc/ros2_arm/src/arm_packet/include/arm.cpp:1[m[K,
+                 from [01m[K/home/nuc/ros2_arm/src/arm_packet/src/arm_controll.cpp:9[m[K:
+[01m[K/home/nuc/ros2_arm/src/arm_packet/include/arm.hpp:11:10:[m[K [01;31m[Kfatal error: [m[Kdynamixel_workbench_toolbox/dynamixel_workbench.h: No such file or directory
+   11 | #include [01;31m[K<dynamixel_workbench_toolbox/dynamixel_workbench.h>[m[K
+      |          [01;31m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+compilation terminated.
+make[2]: *** [CMakeFiles/arm_controll.dir/build.make:63: CMakeFiles/arm_controll.dir/src/arm_controll.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:107: CMakeFiles/arm_controll.dir/all] Error 2
+make: *** [Makefile:141: all] Error 2

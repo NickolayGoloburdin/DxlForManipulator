@@ -1,0 +1,25 @@
+CMake Warning at CMakeLists.txt:17 (find_package):
+  By not providing "Finddynamixel_workbench.cmake" in CMAKE_MODULE_PATH this
+  project has asked CMake to find a package configuration file provided by
+  "dynamixel_workbench", but CMake did not find one.
+
+  Could not find a package configuration file provided by
+  "dynamixel_workbench" with any of the following names:
+
+    dynamixel_workbenchConfig.cmake
+    dynamixel_workbench-config.cmake
+
+  Add the installation prefix of "dynamixel_workbench" to CMAKE_PREFIX_PATH
+  or set "dynamixel_workbench_DIR" to a directory containing one of the above
+  files.  If "dynamixel_workbench" provides a separate development package or
+  SDK, be sure it has been installed.
+
+
+CMake Error at /home/nuc/ros2_rolling/install/ament_cmake_target_dependencies/share/ament_cmake_target_dependencies/cmake/ament_target_dependencies.cmake:77 (message):
+  ament_target_dependencies() the passed package name 'dynamixel_workbench'
+  was not found before
+Call Stack (most recent call first):
+  CMakeLists.txt:20 (ament_target_dependencies)
+
+
+make: *** [Makefile:310: cmake_check_build_system] Error 1

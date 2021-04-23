@@ -1,0 +1,11 @@
+CMake Error at CMakeLists.txt:22 (target_include_directories):
+  Cannot specify include directories for target "my_target" which is not
+  built by this project.
+
+
+CMake Error at /home/nuc/ros2_rolling/install/ament_cmake_target_dependencies/share/ament_cmake_target_dependencies/cmake/ament_target_dependencies.cmake:42 (message):
+  ament_target_dependencies() the first argument must be a valid target name
+Call Stack (most recent call first):
+  CMakeLists.txt:26 (ament_target_dependencies)
+
+

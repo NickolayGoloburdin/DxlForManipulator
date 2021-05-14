@@ -12,6 +12,7 @@
 #define PERIOD_PROTOCOL 15
 #define PERIOD_MOVEMENT 15
 using namespace std;
+using std::placeholders::_1;
 
 // void messageJointscmd(const sensor_msgs::JointState::ConstPtr& toggle_msg,
 // Manipulator* manip )  //control position
@@ -86,7 +87,7 @@ int main(int argc, char **argv) {
   // manip->disable_all_torque();
   // return 0;
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<ROSArm>(ROSArm(manip)));
+  rclcpp::spin(std::make_shared<ROSArm>(manip));
   rclcpp::shutdown();
   manip->disable_all_torque();
   return 0;

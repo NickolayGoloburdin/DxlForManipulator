@@ -18,7 +18,7 @@
 #include <vector>
 
 #define BAUDRATE 1000000
-#define DEVICENAME "/dev/ttyUSB0"
+#define DEVICENAME "/dev/ttyACM0"
 #define DEVICE_NUMBER 0
 
 class Manipulator : public DynamixelWorkbench {
@@ -95,12 +95,15 @@ public:
 };
 class ROSArm : public rclcpp::Node {
 public:
-  explicit ROSArm(Manipulator *manip);
+ROSArm(Manipulator *manip);
 
   Manipulator *manip_;
 
 private:
   void timer_callback();
+  void topic_j_callback(const sensor_msgs::msg::JointState::SharedPtr msg) const;
+  void topic_t_callback(const sensor_msgs::msg::JointState::SharedPtr msg) const;
+  void topic_j_callback(const std_msgs::msg::Bool::SharedPtr msg) const;
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr publisherjs_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr publishertl_;

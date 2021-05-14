@@ -1,5 +1,5 @@
 #include "arm.hpp"
-
+using std::placeholders::_1;
 void Manipulator::set_start_pos() {
   for (auto i : dxl_id)
 
@@ -135,8 +135,16 @@ ROSArm::ROSArm(Manipulator *manip)
       "arm_joint_states", 64);
   publishertl_ =
       this->create_publisher<sensor_msgs::msg::JointState>("temp_load", 64);
-  timer_ =
-      this->create_wall_timer(500, std::bind(&ROSArm::timer_callback, this));
+
+  subscription_ = this->create_subscription<sensor_msgs::msg::JointState>(
+      "topic", 10, std::bind(&MinimalSubscriber::topic_callback, this, _1));
+      subscription_ = this->create_subscription<std_msgs::msg::JointState>(
+      "topic", 10, std::bind(&MinimalSubscriber::topic_callback, this, _1));
+      subscription_ = this->create_subscription<std_msgs::msg::Bool>(
+      "topic", 10, std::bind(&MinimalSubscriber::topic_callback, this, _1));    
+  timer_ = this->create_wall_timer(
+            std::chrono::milliseconds(200),
+            std::bind(&ROSArm::timer_callback, this));
 }
 void ROSArm::timer_callback() {
   manip_->read_all_pos();

@@ -136,16 +136,35 @@ ROSArm::ROSArm(Manipulator *manip)
   publishertl_ =
       this->create_publisher<sensor_msgs::msg::JointState>("temp_load", 64);
 
-  subscription_ = this->create_subscription<sensor_msgs::msg::JointState>(
-      "topic", 10, std::bind(&MinimalSubscriber::topic_callback, this, _1));
-      subscription_ = this->create_subscription<std_msgs::msg::JointState>(
-      "topic", 10, std::bind(&MinimalSubscriber::topic_callback, this, _1));
-      subscription_ = this->create_subscription<std_msgs::msg::Bool>(
-      "topic", 10, std::bind(&MinimalSubscriber::topic_callback, this, _1));    
+  subscription_js_ = this->create_subscription<sensor_msgs::msg::JointState>(
+      "cmd_joints", 10, std::bind(&ROSArm::topic_js_callback, this, _1));
+      subscription_tl_ = this->create_subscription<sensor_msgs::msg::JointState>(
+      "temp_and_load", 10, std::bind(&ROSArm::topic_tl_callback, this, _1));
+      subscription_t_ = this->create_subscription<std_msgs::msg::Bool>(
+      "torque", 10, std::bind(&ROSArm::topic_t_callback, this, _1));    
   timer_ = this->create_wall_timer(
             std::chrono::milliseconds(200),
             std::bind(&ROSArm::timer_callback, this));
 }
+void ROSArm::topic_js_callback(const sensor_msgs::msg::JointState::SharedPtr msg) const
+    {
+      for(int i = 0; i < manip_->motor_q; i++){
+        manip_->goal_position[i] = (int)msg->position[i];
+        }
+        for(int i = 0; i < manip_->motor_q; i++){
+            manip_->goal_velocity[i] = (int)msg->velocity[i];
+        }
+        for(int i = 0; i < manip_->motor_q; i++){
+            manip_->goal_acceleration[i] = (int)msg->effort[i];
+      }
+      
+    }
+  
+    void ROSArm::topic_t_callback(const std_msgs::msg::Bool::SharedPtr msg)
+    {
+      torque_flag_ = msg->data; 
+
+    }
 void ROSArm::timer_callback() {
   manip_->read_all_pos();
   manip_->read_all_vel();

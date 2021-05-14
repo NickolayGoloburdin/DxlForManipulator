@@ -101,9 +101,12 @@ ROSArm(Manipulator *manip);
 
 private:
   void timer_callback();
-  void topic_j_callback(const sensor_msgs::msg::JointState::SharedPtr msg) const;
-  void topic_t_callback(const sensor_msgs::msg::JointState::SharedPtr msg) const;
-  void topic_j_callback(const std_msgs::msg::Bool::SharedPtr msg) const;
+  void topic_js_callback(const sensor_msgs::msg::JointState::SharedPtr msg) const;
+  void topic_tl_callback(const sensor_msgs::msg::JointState::SharedPtr msg) const;
+  void topic_t_callback(const std_msgs::msg::Bool::SharedPtr msg);
+  rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr subscription_js_;
+  rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr subscription_tl_;
+  rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr subscription_t_;
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr publisherjs_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr publishertl_;
